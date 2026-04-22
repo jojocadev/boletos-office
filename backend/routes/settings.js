@@ -13,10 +13,10 @@ router.get('/', async (req, res) => {
 
 router.put('/', async (req, res) => {
     try {
-        const { subject, body, smtp_email, smtp_password } = req.body;
+        const { subject, body, smtp_email, smtp_password, smtp_host, smtp_port } = req.body;
         await pool.query(
-            "UPDATE settings SET subject = $1, body = $2, smtp_email = $3, smtp_password = $4 WHERE id = 1",
-            [subject, body, smtp_email, smtp_password]
+            "UPDATE settings SET subject = $1, body = $2, smtp_email = $3, smtp_password = $4, smtp_host = $5, smtp_port = $6 WHERE id = 1",
+            [subject, body, smtp_email, smtp_password, smtp_host, smtp_port]
         );
         res.json({ message: "Configurações salvas!" });
     } catch (err) {
