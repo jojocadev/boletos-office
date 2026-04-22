@@ -9,22 +9,28 @@ let transporter = null;
 let currentSmtpUser = null;
 
 async function getTransporter(settings) {
+    const host = (settings?.smtp_host || process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+    const port = parseInt(settings?.smtp_port || process.env.SMTP_PORT || '465', 10);
     const user = (settings?.smtp_email || process.env.SMTP_USER || '').trim();
-    const pass = (settings?.smtp_password || process.env.SMTP_PASS || '').trim();
+    const pass = (settings?.smtp_password || process.env.SMTP_PASS || '').trim().replace(/\s/g, ''); // Sanitiza espaços da App Password
 
-    if (transporter && currentSmtpUser === user) return transporter;
+    const currentConfigHash = `${host}:${port}:${user}:${pass}`;
 
-    currentSmtpUser = user;
+    if (transporter && currentSmtpUser === currentConfigHash) {
+        return transporter;
+    }
+
+    currentSmtpUser = currentConfigHash;
     transporter = null;
 
     console.log(`[Fila][v${VERSION}] Iniciando transportador de e-mail...`);
 
     if (user && pass) {
-        console.log(`[Fila] Usando credenciais SMTP reais (${user})...`);
+        console.log(`[Fila] Usando credenciais reais (${user}) via ${host}:${port}...`);
         transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_PORT === '465',
+            host: host,
+            port: port,
+            secure: port === 465,
             auth: {
                 user: user,
                 pass: pass
