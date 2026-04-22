@@ -2,14 +2,21 @@ import { useState, useEffect } from 'react';
 import { Settings, PlayCircle, Loader2, Mail, Lock } from 'lucide-react';
 
 export default function QueueManager() {
-  const [settings, setSettings] = useState({ subject: '', body: '', smtp_email: '', smtp_password: '' });
+  const [settings, setSettings] = useState({ subject: '', body: '', smtp_email: '', smtp_password: '', smtp_host: '', smtp_port: '' });
   const [status, setStatus] = useState({ isRunning: false, stats: {}, currentProcessing: null });
 
   useEffect(() => {
     // Carregar templates
     fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/settings`)
       .then(res => res.json())
-      .then(data => setSettings({ subject: data.subject || '', body: data.body || '', smtp_email: data.smtp_email || '', smtp_password: data.smtp_password || '' }))
+      .then(data => setSettings({ 
+        subject: data.subject || '', 
+        body: data.body || '', 
+        smtp_email: data.smtp_email || '', 
+        smtp_password: data.smtp_password || '',
+        smtp_host: data.smtp_host || '',
+        smtp_port: data.smtp_port || ''
+      }))
       .catch(console.error);
 
     // Polling do status da fila
@@ -85,6 +92,27 @@ export default function QueueManager() {
 
           <h3 className="d-flex align-center gap-2 mb-4 mt-4" style={{borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem'}}><Mail size={20} /> Autenticação de Disparo (Gmail)</h3>
           
+          <div className="mb-4 d-flex gap-4">
+            <div style={{ flex: 2 }}>
+              <label className="text-secondary text-sm">Servidor SMTP (Host)</label>
+              <input 
+                type="text"
+                value={settings.smtp_host} 
+                onChange={e => setSettings({...settings, smtp_host: e.target.value})}
+                placeholder="ex: smtp.gmail.com" 
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="text-secondary text-sm">Porta SMTP</label>
+              <input 
+                type="text"
+                value={settings.smtp_port} 
+                onChange={e => setSettings({...settings, smtp_port: e.target.value})}
+                placeholder="ex: 465 ou 587" 
+              />
+            </div>
+          </div>
+
           <div className="mb-4">
             <label className="text-secondary text-sm">E-mail do Remetente</label>
             <input 
