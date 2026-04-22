@@ -51,6 +51,8 @@ const initDb = async () => {
         try {
             await pool.query("ALTER TABLE settings ADD COLUMN IF NOT EXISTS smtp_email TEXT");
             await pool.query("ALTER TABLE settings ADD COLUMN IF NOT EXISTS smtp_password TEXT");
+            await pool.query("ALTER TABLE settings ADD COLUMN IF NOT EXISTS smtp_host TEXT");
+            await pool.query("ALTER TABLE settings ADD COLUMN IF NOT EXISTS smtp_port TEXT");
         } catch (e) {
             console.error("Migração opcional falhou:", e);
         }
